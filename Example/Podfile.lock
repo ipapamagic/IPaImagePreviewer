@@ -1,0 +1,23 @@
+PODS:
+  - FBSnapshotTestCase (2.1.4):
+    - FBSnapshotTestCase/SwiftSupport (= 2.1.4)
+  - FBSnapshotTestCase/Core (2.1.4)
+  - FBSnapshotTestCase/SwiftSupport (2.1.4):
+    - FBSnapshotTestCase/Core
+  - IPaImagePreviewer (1.0)
+
+DEPENDENCIES:
+  - FBSnapshotTestCase
+  - IPaImagePreviewer (from `../`)
+
+EXTERNAL SOURCES:
+  IPaImagePreviewer:
+    :path: ../
+
+SPEC CHECKSUMS:
+  FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
+  IPaImagePreviewer: 9a761d443113dba366fc57ef056b6e000d06f4ab
+
+PODFILE CHECKSUM: 5f09f95be4185d66f5808622ea996cd9cc917314
+
+COCOAPODS: 1.3.0

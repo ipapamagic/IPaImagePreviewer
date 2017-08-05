@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'IPaImagePreviewer_Example' do
+  pod 'IPaImagePreviewer', :path => '../'
+
+  target 'IPaImagePreviewer_Tests' do
+    inherit! :search_paths
+
+    pod 'FBSnapshotTestCase'
+  end
+end
