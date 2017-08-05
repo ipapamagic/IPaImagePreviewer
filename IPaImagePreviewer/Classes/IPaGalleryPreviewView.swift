@@ -25,6 +25,21 @@ open class IPaGalleryPreviewView: UIView {
         
         return pageViewController
     }()
+    lazy var _doubleTapRecognizer:UITapGestureRecognizer = {
+        let recognizer = UITapGestureRecognizer(target: self, action: #selector(IPaGalleryPreviewView.onZoom(_:)))
+        recognizer.numberOfTapsRequired = 2
+        recognizer.cancelsTouchesInView = true
+        recognizer.delaysTouchesBegan = false
+        recognizer.delaysTouchesEnded = true
+        recognizer.delegate = self
+        
+        return recognizer
+    }()
+    open var doubleTapRecognizer:UITapGestureRecognizer {
+        get {
+            return _doubleTapRecognizer
+        }
+    }
     open var delegate:IPaGalleryPreviewViewDelegate!
     lazy var previewViewControllers:[IPaImagePreviewViewController] = {
 
@@ -52,6 +67,7 @@ open class IPaGalleryPreviewView: UIView {
         let viewsDict:[String:UIView] = ["view": pageViewController.view]
         self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[view]|",options:NSLayoutFormatOptions(rawValue: 0),metrics:nil,views:viewsDict))
         self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[view]|",options:NSLayoutFormatOptions(rawValue: 0),metrics:nil,views:viewsDict))
+        self.addGestureRecognizer(self.doubleTapRecognizer)
     }
     
     open func reloadData() {
@@ -81,7 +97,15 @@ open class IPaGalleryPreviewView: UIView {
 //        }
         pageViewController.setViewControllers([nextViewController], direction: direction, animated: true, completion: nil)
     }
-
+    func onZoom(_ sender:UITapGestureRecognizer)
+    {
+        for previewViewController in previewViewControllers
+        {
+            if previewViewController.pageIndex == currentIndex {
+                previewViewController.onZoom(sender)
+            }
+        }
+    }
     
 }
 extension IPaGalleryPreviewView:UIPageViewControllerDataSource,UIPageViewControllerDelegate
@@ -144,4 +168,11 @@ extension IPaGalleryPreviewView:UIPageViewControllerDataSource,UIPageViewControl
     }
 }
 
+extension IPaGalleryPreviewView:UIGestureRecognizerDelegate
+{
+    public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return false
+    }
+    
+}
 

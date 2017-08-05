@@ -19,7 +19,7 @@ class IPaImagePreviewViewController: UIViewController,UIScrollViewDelegate,UIGes
         self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[view]|",options:NSLayoutFormatOptions(rawValue: 0),metrics:nil,views:viewsDict))
         self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[view]|",options:NSLayoutFormatOptions(rawValue: 0),metrics:nil,views:viewsDict))
         
-        scrollView.addGestureRecognizer(self.doubleTapRecognizer)
+     //   scrollView.addGestureRecognizer(self.doubleTapRecognizer)
         return scrollView
     }()
     
@@ -45,15 +45,7 @@ class IPaImagePreviewViewController: UIViewController,UIScrollViewDelegate,UIGes
         
         return imageView
     }()
-    lazy var doubleTapRecognizer:UITapGestureRecognizer = {
-        let recognizer = UITapGestureRecognizer(target: self, action: #selector(IPaImagePreviewViewController.onZoom(_:)))
-        recognizer.numberOfTapsRequired = 2
-        recognizer.cancelsTouchesInView = true
-        recognizer.delaysTouchesBegan = false
-        recognizer.delaysTouchesEnded = true
-        recognizer.delegate = self
-        return recognizer
-    }()
+    
     lazy var imgViewHeightConstraint = NSLayoutConstraint()
     lazy var imgViewWidthConstraint = NSLayoutConstraint()
     lazy var imgViewTopConstraint = NSLayoutConstraint()
@@ -164,10 +156,7 @@ class IPaImagePreviewViewController: UIViewController,UIScrollViewDelegate,UIGes
 
     }
     
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        return false
-    }
-    
+   
     //MARK:UIScrollViewDelegate
     func viewForZooming(in scrollView: UIScrollView) -> UIView? {
         return contentImageView
