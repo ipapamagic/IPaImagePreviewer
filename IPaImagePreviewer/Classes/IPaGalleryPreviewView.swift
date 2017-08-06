@@ -35,6 +35,16 @@ open class IPaGalleryPreviewView: UIView {
         
         return recognizer
     }()
+    var currentPreviewViewController:IPaImagePreviewViewController {
+        get {
+            for previewViewController in previewViewControllers {
+                if previewViewController.pageIndex == currentIndex {
+                    return previewViewController
+                }
+            }
+            return IPaImagePreviewViewController()
+        }
+    }
     open var doubleTapRecognizer:UITapGestureRecognizer {
         get {
             return _doubleTapRecognizer
@@ -45,9 +55,15 @@ open class IPaGalleryPreviewView: UIView {
 
         let previewViewController = IPaImagePreviewViewController()
         let previewViewController2 = IPaImagePreviewViewController()
+        
         return [previewViewController,previewViewController2]
     }()
     open var currentIndex = 0
+    open var currentImageSize:CGSize {
+        get {
+            return self.currentPreviewViewController.contentImageView.bounds.size
+        }
+    }
     override open func awakeFromNib() {
         super.awakeFromNib()
         self.initialSetting()
@@ -69,7 +85,15 @@ open class IPaGalleryPreviewView: UIView {
         self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[view]|",options:NSLayoutFormatOptions(rawValue: 0),metrics:nil,views:viewsDict))
         self.addGestureRecognizer(self.doubleTapRecognizer)
     }
-    
+    open func setCurrentImage(transform:CGAffineTransform)
+    {
+        self.currentPreviewViewController.contentImageView.transform = transform
+    }
+    open func reloadCurrentPage() {
+        let image = delegate?.imageForGallery(self, index: currentIndex)
+        self.currentPreviewViewController.loadingImage = image
+        self.currentPreviewViewController.image = image
+    }
     open func reloadData() {
         let numberCount = delegate!.numberOfImagesForGallery(self)
         var direction:UIPageViewControllerNavigationDirection = .forward
@@ -90,6 +114,7 @@ open class IPaGalleryPreviewView: UIView {
         else {
             nextViewController = previewViewControllers.first!
         }
+        viewController.pageIndex = currentIndex + 1
         nextViewController.pageIndex = currentIndex
         nextViewController.loadingImage = delegate?.imageForGallery(self, index: currentIndex)
 //        if let loadingImage = nextViewController.loadingImage {

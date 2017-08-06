@@ -60,6 +60,7 @@ class IPaImagePreviewViewController: UIViewController,UIScrollViewDelegate,UIGes
         }
         set {
             contentImageView.image = newValue
+            contentImageView.transform = .identity
             contentScrollView.setZoomScale(1, animated: false)
             refreshPictureImageView(contentScrollView.zoomScale)
             contentScrollView.layoutIfNeeded()
