@@ -4,7 +4,9 @@ PODS:
   - FBSnapshotTestCase/Core (2.1.4)
   - FBSnapshotTestCase/SwiftSupport (2.1.4):
     - FBSnapshotTestCase/Core
-  - IPaImagePreviewer (1.0)
+  - IPaImagePreviewer (2.0):
+    - IPaIndicator
+  - IPaIndicator (2.0.1)
 
 DEPENDENCIES:
   - FBSnapshotTestCase
@@ -16,8 +18,9 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
-  IPaImagePreviewer: 9a761d443113dba366fc57ef056b6e000d06f4ab
+  IPaImagePreviewer: af82735516f90f8faf35cf2b65cd1c50f8161a00
+  IPaIndicator: c966595d8a4c6530070f4b8a8f594ed87f76b399
 
-PODFILE CHECKSUM: 5f09f95be4185d66f5808622ea996cd9cc917314
+PODFILE CHECKSUM: f5badeaac291170a7979c38e7b54c8a8e0b5f3cb
 
 COCOAPODS: 1.3.0

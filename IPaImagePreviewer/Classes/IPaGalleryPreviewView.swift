@@ -7,9 +7,10 @@
 //
 
 import UIKit
-public protocol IPaGalleryPreviewViewDelegate {
-    func numberOfImagesForGallery(_ galleryView:IPaGalleryPreviewView) -> Int
-    func imageForGallery(_ galleryView:IPaGalleryPreviewView,index:Int) -> UIImage?
+@objc public protocol IPaGalleryPreviewViewDelegate {
+    func numberOfImages(_ galleryView:IPaGalleryPreviewView) -> Int
+    func loadImage(_ galleryView:IPaGalleryPreviewView,index:Int,complete:@escaping (UIImage?)->())
+    func customView(_ galleryView:IPaGalleryPreviewView,index:Int,reuseCustomView:UIView?) ->  UIView?
 }
 open class IPaGalleryPreviewView: UIView {
     lazy var pageViewController:UIPageViewController = {
@@ -19,7 +20,7 @@ open class IPaGalleryPreviewView: UIView {
         pageViewController.view.backgroundColor = UIColor.black
         let previewViewController = self.previewViewControllers.first!
         previewViewController.pageIndex = self.currentIndex
-        previewViewController.loadingImage = self.delegate?.imageForGallery(self, index: self.currentIndex)
+        previewViewController.delegate = self
         pageViewController.setViewControllers([previewViewController], direction:.forward, animated: false, completion: nil)
         
         
@@ -42,7 +43,7 @@ open class IPaGalleryPreviewView: UIView {
                     return previewViewController
                 }
             }
-            return IPaImagePreviewViewController()
+            return previewViewControllers.first!
         }
     }
     open var doubleTapRecognizer:UITapGestureRecognizer {
@@ -50,15 +51,29 @@ open class IPaGalleryPreviewView: UIView {
             return _doubleTapRecognizer
         }
     }
-    open var delegate:IPaGalleryPreviewViewDelegate!
+    @IBOutlet open var delegate:IPaGalleryPreviewViewDelegate!
+    
+    /// Workaround for Xcode bug that prevents you from connecting the delegate in the storyboard.
+    /// Remove this extra property once Xcode gets fixed.
+    @IBOutlet public var ibDelegate: AnyObject? {
+        get {
+            return delegate
+        }
+        set {
+            delegate = newValue as? IPaGalleryPreviewViewDelegate
+        }
+    }
     lazy var previewViewControllers:[IPaImagePreviewViewController] = {
 
         let previewViewController = IPaImagePreviewViewController()
         let previewViewController2 = IPaImagePreviewViewController()
-        
-        return [previewViewController,previewViewController2]
+        let previewViewController3 = IPaImagePreviewViewController()
+        previewViewController.delegate = self
+        previewViewController2.delegate = self
+        previewViewController3.delegate = self
+        return [previewViewController,previewViewController2,previewViewController3]
     }()
-    open var currentIndex = 0
+    open dynamic var currentIndex = 0
     open var currentImageSize:CGSize {
         get {
             return self.currentPreviewViewController.contentImageView.bounds.size
@@ -75,7 +90,7 @@ open class IPaGalleryPreviewView: UIView {
     
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        self.initialSetting()
+//        self.initialSetting()
     }
     func initialSetting() {
         pageViewController.view.translatesAutoresizingMaskIntoConstraints = false
@@ -90,12 +105,15 @@ open class IPaGalleryPreviewView: UIView {
         self.currentPreviewViewController.contentImageView.transform = transform
     }
     open func reloadCurrentPage() {
-        let image = delegate?.imageForGallery(self, index: currentIndex)
-        self.currentPreviewViewController.loadingImage = image
-        self.currentPreviewViewController.image = image
+        self.delegate.loadImage(self, index: currentIndex, complete: {
+            image in
+            self.currentPreviewViewController.image = image
+        })
+        
+        
     }
     open func reloadData() {
-        let numberCount = delegate!.numberOfImagesForGallery(self)
+        let numberCount = delegate.numberOfImages(self)
         var direction:UIPageViewControllerNavigationDirection = .forward
         if currentIndex >= numberCount {
             currentIndex = numberCount - 1
@@ -104,23 +122,25 @@ open class IPaGalleryPreviewView: UIView {
         if currentIndex < 0 {
             currentIndex = 0
         }
+        let thisViewController = currentPreviewViewController
         
-        let viewController = pageViewController.viewControllers!.first! as! IPaImagePreviewViewController
-        var nextViewController:IPaImagePreviewViewController
-        let index = previewViewControllers.index(of: viewController)!
-        if index == 0 {
-            nextViewController = previewViewControllers.last!
+        let index = previewViewControllers.index(of: currentPreviewViewController) ?? 0
+        var nextIndex = index + 1
+        if nextIndex >= previewViewControllers.count {
+            nextIndex = 0
         }
-        else {
-            nextViewController = previewViewControllers.first!
+        var lastIndex = index - 1
+        if lastIndex < 0 {
+            lastIndex = previewViewControllers.count - 1
         }
-        viewController.pageIndex = currentIndex + 1
-        nextViewController.pageIndex = currentIndex
-        nextViewController.loadingImage = delegate?.imageForGallery(self, index: currentIndex)
-//        if let loadingImage = nextViewController.loadingImage {
-//            nextViewController.image = loadingImage
-//        }
-        pageViewController.setViewControllers([nextViewController], direction: direction, animated: true, completion: nil)
+        let nextViewController = previewViewControllers[nextIndex]
+        let lastViewController = previewViewControllers[lastIndex]
+        
+        
+        nextViewController.pageIndex = currentIndex + 1
+        thisViewController.pageIndex = currentIndex
+        lastViewController.pageIndex = currentIndex - 1
+        pageViewController.setViewControllers([thisViewController], direction: direction, animated: false, completion: nil)
     }
     func onZoom(_ sender:UITapGestureRecognizer)
     {
@@ -133,30 +153,37 @@ open class IPaGalleryPreviewView: UIView {
     }
     
 }
+extension IPaGalleryPreviewView:IPaImagePreviewViewControllerDelegate
+{
+    func loadImage(index: Int, complete: @escaping (UIImage?) -> ()) {
+        self.delegate.loadImage(self, index: index, complete: complete)
+    }
+    func customView(_ previewViewController:IPaImagePreviewViewController,reuseCustomView:UIView?) ->  UIView?
+    {
+        return self.delegate.customView(self, index: previewViewController.pageIndex, reuseCustomView: reuseCustomView)
+    }
+}
 extension IPaGalleryPreviewView:UIPageViewControllerDataSource,UIPageViewControllerDelegate
 {
     //MARK : UIPageViewControllerDataSource
     
     public func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
         let previewViewController = viewController as! IPaImagePreviewViewController
-        var beforeViewController:IPaImagePreviewViewController?
         if previewViewController.pageIndex == 0 {
             return nil
         }
-        else {
-            if let index = previewViewControllers.index(of: previewViewController) {
-                if index == 0 {
-                    beforeViewController = previewViewControllers.last
-                }
-                else {
-                    beforeViewController = previewViewControllers.first
-                }
-                let index = previewViewController.pageIndex - 1
-                beforeViewController!.pageIndex = index
-                beforeViewController!.loadingImage = delegate?.imageForGallery(self, index: index)
-                
-                return beforeViewController
+        else if let index = previewViewControllers.index(of: previewViewController) {
+            var lastIndex = index + 2
+            while lastIndex >= previewViewControllers.count {
+                lastIndex -= previewViewControllers.count
             }
+            let beforeViewController = previewViewControllers[ lastIndex]
+            
+            let index = previewViewController.pageIndex - 1
+            beforeViewController.pageIndex = index
+            
+            return beforeViewController
+        
         }
         return nil
     }
@@ -164,24 +191,21 @@ extension IPaGalleryPreviewView:UIPageViewControllerDataSource,UIPageViewControl
     
     public func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
         let previewViewController = viewController as! IPaImagePreviewViewController
-        var afterViewController:IPaImagePreviewViewController?
-        let numberCount = delegate!.numberOfImagesForGallery(self)
+        let numberCount = delegate.numberOfImages(self)
         if previewViewController.pageIndex == (numberCount - 1) {
             return nil
         }
-        else {
-            if let index = previewViewControllers.index(of: previewViewController) {
-                if index == 0 {
-                    afterViewController = previewViewControllers.last
-                }
-                else {
-                    afterViewController = previewViewControllers.first
-                }
-                let index = previewViewController.pageIndex + 1
-                afterViewController!.pageIndex = index
-                afterViewController!.loadingImage = delegate?.imageForGallery(self, index: index)
-                return afterViewController
+        else if let index = previewViewControllers.index(of: previewViewController) {
+            var nextIndex = index + 1
+            while nextIndex >= previewViewControllers.count {
+                nextIndex -= previewViewControllers.count
             }
+            let nextViewController = previewViewControllers[ nextIndex]
+            
+            let index = previewViewController.pageIndex + 1
+            nextViewController.pageIndex = index
+            
+            return nextViewController
         }
         return nil
     }

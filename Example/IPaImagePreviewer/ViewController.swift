@@ -27,15 +27,17 @@ class ViewController: UIViewController {
 
 extension ViewController:IPaGalleryPreviewViewDelegate
 {
-    func numberOfImagesForGallery(_ galleryView:IPaGalleryPreviewView) -> Int
-    {
+    func numberOfImages(_ galleryView: IPaGalleryPreviewView) -> Int {
         return 3
     }
-    func imageForGallery(_ galleryView:IPaGalleryPreviewView,index:Int) -> UIImage?
-    {
+
+    func loadImage(_ galleryView: IPaGalleryPreviewView, index: Int, complete: (UIImage?) -> ()) {
+        
         if let path = Bundle.main.path(forResource: "\(index + 1)", ofType: "JPG") {
-            return UIImage(contentsOfFile: path)
+            complete(UIImage(contentsOfFile: path))
+            return
         }
-        return nil
+        return complete(nil)
     }
+    
 }

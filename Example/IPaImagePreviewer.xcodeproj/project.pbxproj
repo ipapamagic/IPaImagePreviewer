@@ -368,10 +368,12 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-IPaImagePreviewer_Example/Pods-IPaImagePreviewer_Example-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/IPaImagePreviewer/IPaImagePreviewer.framework",
+				"${BUILT_PRODUCTS_DIR}/IPaIndicator/IPaIndicator.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/IPaImagePreviewer.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/IPaIndicator.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

@@ -7,8 +7,14 @@
 //
 
 import UIKit
-
+import IPaIndicator
+protocol IPaImagePreviewViewControllerDelegate
+{
+    func loadImage(index:Int,complete:@escaping (UIImage?)->())
+    func customView(_ previewViewController:IPaImagePreviewViewController,reuseCustomView:UIView?) ->  UIView?
+}
 class IPaImagePreviewViewController: UIViewController,UIScrollViewDelegate,UIGestureRecognizerDelegate{
+    var delegate:IPaImagePreviewViewControllerDelegate!
     lazy var contentScrollView:UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.delegate = self
@@ -52,8 +58,39 @@ class IPaImagePreviewViewController: UIViewController,UIScrollViewDelegate,UIGes
     lazy var imgViewLeadingConstraint = NSLayoutConstraint()
     lazy var imgViewBottomConstraint = NSLayoutConstraint()
     lazy var imgViewTrailingConstraint = NSLayoutConstraint()
-    var pageIndex:Int = 0
-    var loadingImage:UIImage?
+    var customView:UIView?
+    {
+        didSet {
+            if let oldValue = oldValue {
+                if oldValue == customView {
+                    return
+                }
+                else {
+                    oldValue.removeFromSuperview()
+                }
+            }
+            if let customView = customView {
+                customView.autoresizingMask = [.flexibleHeight,.flexibleWidth]
+                customView.translatesAutoresizingMaskIntoConstraints = true
+                
+                customView.frame = self.view.bounds
+                self.view.addSubview(customView)
+                
+            }
+            
+        }
+    }
+    var pageIndex:Int = 0 {
+        didSet {
+            self.image = nil
+            self.delegate.loadImage(index: pageIndex, complete: {
+                loadedImage in
+                self.image = loadedImage
+            })
+            
+            self.customView = self.delegate.customView(self, reuseCustomView: self.customView)
+        }
+    }
     var image:UIImage? {
         get {
             return contentImageView.image
@@ -68,27 +105,15 @@ class IPaImagePreviewViewController: UIViewController,UIScrollViewDelegate,UIGes
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        
-        
-        if let loadingImage = loadingImage {
-            image = loadingImage
-        }
         //        singleTapRecognizer.requireGestureRecognizerToFail(doubleTapRecognizer)
         // Do any additional setup after loading the view.
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if let loadingImage = loadingImage {
-            image = loadingImage
-        }
+        
+
     }
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
-        if let loadingImage = loadingImage {
-            image = loadingImage
-        }
-    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
