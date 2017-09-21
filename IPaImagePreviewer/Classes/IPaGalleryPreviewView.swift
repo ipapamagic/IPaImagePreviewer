@@ -51,7 +51,7 @@ open class IPaGalleryPreviewView: UIView {
             return _doubleTapRecognizer
         }
     }
-    @IBOutlet open var delegate:IPaGalleryPreviewViewDelegate!
+    @IBOutlet open var delegate:IPaGalleryPreviewViewDelegate?
     
     /// Workaround for Xcode bug that prevents you from connecting the delegate in the storyboard.
     /// Remove this extra property once Xcode gets fixed.
@@ -73,7 +73,7 @@ open class IPaGalleryPreviewView: UIView {
         previewViewController3.delegate = self
         return [previewViewController,previewViewController2,previewViewController3]
     }()
-    open dynamic var currentIndex = 0
+    @objc open dynamic var currentIndex = 0
     open var currentImageSize:CGSize {
         get {
             return self.currentPreviewViewController.contentImageView.bounds.size
@@ -105,7 +105,7 @@ open class IPaGalleryPreviewView: UIView {
         self.currentPreviewViewController.contentImageView.transform = transform
     }
     open func reloadCurrentPage() {
-        self.delegate.loadImage(self, index: currentIndex, complete: {
+        self.delegate?.loadImage(self, index: currentIndex, complete: {
             image in
             self.currentPreviewViewController.image = image
         })
@@ -113,7 +113,7 @@ open class IPaGalleryPreviewView: UIView {
         
     }
     open func reloadData() {
-        let numberCount = delegate.numberOfImages(self)
+        let numberCount = delegate?.numberOfImages(self) ?? 0
         var direction:UIPageViewControllerNavigationDirection = .forward
         if currentIndex >= numberCount {
             currentIndex = numberCount - 1
@@ -142,7 +142,7 @@ open class IPaGalleryPreviewView: UIView {
         lastViewController.pageIndex = currentIndex - 1
         pageViewController.setViewControllers([thisViewController], direction: direction, animated: false, completion: nil)
     }
-    func onZoom(_ sender:UITapGestureRecognizer)
+    @objc func onZoom(_ sender:UITapGestureRecognizer)
     {
         for previewViewController in previewViewControllers
         {
@@ -156,11 +156,11 @@ open class IPaGalleryPreviewView: UIView {
 extension IPaGalleryPreviewView:IPaImagePreviewViewControllerDelegate
 {
     func loadImage(index: Int, complete: @escaping (UIImage?) -> ()) {
-        self.delegate.loadImage(self, index: index, complete: complete)
+        self.delegate?.loadImage(self, index: index, complete: complete)
     }
     func customView(_ previewViewController:IPaImagePreviewViewController,reuseCustomView:UIView?) ->  UIView?
     {
-        return self.delegate.customView(self, index: previewViewController.pageIndex, reuseCustomView: reuseCustomView)
+        return self.delegate?.customView(self, index: previewViewController.pageIndex, reuseCustomView: reuseCustomView)
     }
 }
 extension IPaGalleryPreviewView:UIPageViewControllerDataSource,UIPageViewControllerDelegate
@@ -191,7 +191,7 @@ extension IPaGalleryPreviewView:UIPageViewControllerDataSource,UIPageViewControl
     
     public func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
         let previewViewController = viewController as! IPaImagePreviewViewController
-        let numberCount = delegate.numberOfImages(self)
+        let numberCount = delegate?.numberOfImages(self) ?? 0
         if previewViewController.pageIndex == (numberCount - 1) {
             return nil
         }

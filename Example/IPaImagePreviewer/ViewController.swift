@@ -27,11 +27,11 @@ class ViewController: UIViewController {
 
 extension ViewController:IPaGalleryPreviewViewDelegate
 {
-    func numberOfImages(_ galleryView: IPaGalleryPreviewView) -> Int {
-        return 3
+    func customView(_ galleryView: IPaGalleryPreviewView, index: Int, reuseCustomView: UIView?) -> UIView? {
+        return nil
     }
 
-    func loadImage(_ galleryView: IPaGalleryPreviewView, index: Int, complete: (UIImage?) -> ()) {
+    func loadImage(_ galleryView: IPaGalleryPreviewView, index: Int, complete: @escaping (UIImage?) -> ()) {
         
         if let path = Bundle.main.path(forResource: "\(index + 1)", ofType: "JPG") {
             complete(UIImage(contentsOfFile: path))
@@ -39,5 +39,11 @@ extension ViewController:IPaGalleryPreviewViewDelegate
         }
         return complete(nil)
     }
+
+    func numberOfImages(_ galleryView: IPaGalleryPreviewView) -> Int {
+        return 3
+    }
+
+    
     
 }
