@@ -29,8 +29,8 @@ open class IPaImagePreviewView: UIView {
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(scrollView)
         let viewsDict:[String:UIView] = ["view": scrollView]
-        self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[view]|",options:NSLayoutFormatOptions(rawValue: 0),metrics:nil,views:viewsDict))
-        self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[view]|",options:NSLayoutFormatOptions(rawValue: 0),metrics:nil,views:viewsDict))
+        self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[view]|",options:NSLayoutConstraint.FormatOptions(rawValue: 0),metrics:nil,views:viewsDict))
+        self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[view]|",options:NSLayoutConstraint.FormatOptions(rawValue: 0),metrics:nil,views:viewsDict))
         
         //   scrollView.addGestureRecognizer(self.doubleTapRecognizer)
         return scrollView

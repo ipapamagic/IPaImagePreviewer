@@ -96,8 +96,8 @@ open class IPaGalleryPreviewView: UIView {
         pageViewController.view.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(pageViewController.view)
         let viewsDict:[String:UIView] = ["view": pageViewController.view]
-        self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[view]|",options:NSLayoutFormatOptions(rawValue: 0),metrics:nil,views:viewsDict))
-        self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[view]|",options:NSLayoutFormatOptions(rawValue: 0),metrics:nil,views:viewsDict))
+        self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|[view]|",options:NSLayoutConstraint.FormatOptions(rawValue: 0),metrics:nil,views:viewsDict))
+        self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[view]|",options:NSLayoutConstraint.FormatOptions(rawValue: 0),metrics:nil,views:viewsDict))
         self.addGestureRecognizer(self.doubleTapRecognizer)
     }
     open func setCurrentImage(transform:CGAffineTransform)
@@ -114,7 +114,7 @@ open class IPaGalleryPreviewView: UIView {
     }
     open func reloadData() {
         let numberCount = delegate?.numberOfImages(self) ?? 0
-        var direction:UIPageViewControllerNavigationDirection = .forward
+        var direction:UIPageViewController.NavigationDirection = .forward
         if currentIndex >= numberCount {
             currentIndex = numberCount - 1
             direction = .reverse
