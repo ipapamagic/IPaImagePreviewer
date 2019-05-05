@@ -124,7 +124,7 @@ open class IPaGalleryPreviewView: UIView {
         }
         let thisViewController = currentPreviewViewController
         
-        let index = previewViewControllers.index(of: currentPreviewViewController) ?? 0
+        let index = previewViewControllers.firstIndex(of: currentPreviewViewController) ?? 0
         var nextIndex = index + 1
         if nextIndex >= previewViewControllers.count {
             nextIndex = 0
@@ -172,7 +172,7 @@ extension IPaGalleryPreviewView:UIPageViewControllerDataSource,UIPageViewControl
         if previewViewController.pageIndex == 0 {
             return nil
         }
-        else if let index = previewViewControllers.index(of: previewViewController) {
+        else if let index = previewViewControllers.firstIndex(of: previewViewController) {
             var lastIndex = index + 2
             while lastIndex >= previewViewControllers.count {
                 lastIndex -= previewViewControllers.count
@@ -195,7 +195,7 @@ extension IPaGalleryPreviewView:UIPageViewControllerDataSource,UIPageViewControl
         if previewViewController.pageIndex == (numberCount - 1) {
             return nil
         }
-        else if let index = previewViewControllers.index(of: previewViewController) {
+        else if let index = previewViewControllers.firstIndex(of: previewViewController) {
             var nextIndex = index + 1
             while nextIndex >= previewViewControllers.count {
                 nextIndex -= previewViewControllers.count

@@ -8,9 +8,9 @@
 
 Pod::Spec.new do |s|
   s.name             = 'IPaImagePreviewer'
-  s.version          = '3.1'
+  s.version          = '3.2'
   s.summary          = 'A short description of IPaImagePreviewer.'
-  s.swift_version    = '4.2'
+  s.swift_version    = '5.0'
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
 #   * Try to keep it short, snappy and to the point.
@@ -28,7 +28,7 @@ TODO: Add long description of the pod here.
   s.source           = { :git => 'https://github.com/ipapamagic/IPaImagePreviewer.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.ios.deployment_target = '8.0'
+  s.ios.deployment_target = '10.3'
 
   s.source_files = 'IPaImagePreviewer/Classes/**/*'
   

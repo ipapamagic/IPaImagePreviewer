@@ -1,13 +1,8 @@
 source 'https://github.com/ipapamagic/IPaPods.git'
 source 'https://github.com/CocoaPods/Specs.git'
 use_frameworks!
-
+platform:ios, '10.3'
 target 'IPaImagePreviewer_Example' do
   pod 'IPaImagePreviewer', :path => '../'
 
-  target 'IPaImagePreviewer_Tests' do
-    inherit! :search_paths
-
-    pod 'FBSnapshotTestCase'
-  end
 end
