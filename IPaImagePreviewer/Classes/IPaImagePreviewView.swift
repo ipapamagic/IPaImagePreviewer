@@ -74,7 +74,7 @@ open class IPaImagePreviewView: UIView {
             contentImageView.transform = .identity
             contentScrollView.setZoomScale(1, animated: false)
           
-            refreshPictureImageView(contentScrollView.zoomScale)
+            self.refreshPicture()
             contentScrollView.layoutIfNeeded()
         }
     }
@@ -82,6 +82,10 @@ open class IPaImagePreviewView: UIView {
         get {
             return contentImageView.frame
         }
+    }
+    open override func layoutSubviews() {
+        super.layoutSubviews()
+        self.refreshPicture()
     }
     open func refreshPicture()
     {
@@ -109,14 +113,14 @@ open class IPaImagePreviewView: UIView {
         if ratio >= viewRatio {
             imageViewWidth = viewWidth * scale
             imageViewHeight = imageViewWidth / ratio
-            contentScrollView.contentInset = UIEdgeInsets(top: max(0,(viewHeight - imageViewHeight) * 0.5), left: 0, bottom: 0, right: 0)
+            contentScrollView.contentInset = UIEdgeInsets(top: max(0,max(0,(viewHeight - imageViewHeight) * 0.5)), left: 0, bottom: 0, right: 0)
             //            imgViewLeadingConstraint.constant = 0
             //            imgViewTopConstraint.constant = -max(0,(viewHeight - imageViewHeight) * 0.5)
         }
         else {
             imageViewHeight = viewHeight * scale
             imageViewWidth = imageViewHeight * ratio
-            contentScrollView.contentInset = UIEdgeInsets(top: 0, left:(viewWidth - imageViewWidth) * 0.5, bottom: 0, right: 0)
+            contentScrollView.contentInset = UIEdgeInsets(top: 0, left:max(0,(viewWidth - imageViewWidth) * 0.5), bottom: 0, right: 0)
             //            imgViewTopConstraint.constant = 0
             //            imgViewLeadingConstraint.constant = -max(0,(viewWidth - imageViewWidth) * 0.5)
         }
@@ -133,7 +137,7 @@ extension IPaImagePreviewView:UIScrollViewDelegate
         return contentImageView
     }
     public func scrollViewDidZoom(_ scrollView: UIScrollView) {
-        refreshPictureImageView(scrollView.zoomScale)
+        self.refreshPicture()
     }
     public func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
         UIView.animate(withDuration: 0.3, animations: {
