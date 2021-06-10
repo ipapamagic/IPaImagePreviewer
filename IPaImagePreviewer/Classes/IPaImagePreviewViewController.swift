@@ -10,7 +10,7 @@ import UIKit
 import IPaIndicator
 protocol IPaImagePreviewViewControllerDelegate
 {
-    func loadImage(index:Int,complete:@escaping (UIImage?)->())
+    func loadImage(index:Int,complete:@escaping (UIImage?,Int)->()) -> UIImage?
     func customView(_ previewViewController:IPaImagePreviewViewController,reuseCustomView:UIView?) ->  UIView?
 }
 class IPaImagePreviewViewController: UIViewController,UIScrollViewDelegate,UIGestureRecognizerDelegate{
@@ -68,10 +68,11 @@ class IPaImagePreviewViewController: UIViewController,UIScrollViewDelegate,UIGes
     }
     var pageIndex:Int = 0 {
         didSet {
-            previewView.image = nil
-            self.delegate.loadImage(index: pageIndex, complete: {
-                loadedImage in
-                self.previewView.image = loadedImage
+            previewView.image = self.delegate.loadImage(index: pageIndex, complete: {
+                loadedImage,index in
+                if index == self.pageIndex {
+                    self.previewView.image = loadedImage
+                }
             })
             
             self.customView = self.delegate.customView(self, reuseCustomView: self.customView)

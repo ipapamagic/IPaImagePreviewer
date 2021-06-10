@@ -9,7 +9,7 @@
 import UIKit
 @objc public protocol IPaGalleryPreviewViewDelegate {
     func numberOfImages(_ galleryView:IPaGalleryPreviewView) -> Int
-    func loadImage(_ galleryView:IPaGalleryPreviewView,index:Int,complete:@escaping (UIImage?)->())
+    func loadImage(_ galleryView:IPaGalleryPreviewView,index:Int,complete:@escaping (UIImage?)->()) -> UIImage?
     func customView(_ galleryView:IPaGalleryPreviewView,index:Int,reuseCustomView:UIView?) ->  UIView?
 }
 open class IPaGalleryPreviewView: UIView {
@@ -19,7 +19,7 @@ open class IPaGalleryPreviewView: UIView {
         pageViewController.dataSource = self
         pageViewController.view.backgroundColor = UIColor.black
         let previewViewController = self.previewViewControllers.first!
-        previewViewController.pageIndex = self.currentIndex
+        previewViewController.pageIndex = self._currentIndex
         previewViewController.delegate = self
         pageViewController.setViewControllers([previewViewController], direction:.forward, animated: false, completion: nil)
         
@@ -39,7 +39,7 @@ open class IPaGalleryPreviewView: UIView {
     var currentPreviewViewController:IPaImagePreviewViewController {
         get {
             for previewViewController in previewViewControllers {
-                if previewViewController.pageIndex == currentIndex {
+                if previewViewController.pageIndex == _currentIndex {
                     return previewViewController
                 }
             }
@@ -53,16 +53,16 @@ open class IPaGalleryPreviewView: UIView {
     }
     @IBOutlet open var delegate:IPaGalleryPreviewViewDelegate?
     
-    /// Workaround for Xcode bug that prevents you from connecting the delegate in the storyboard.
-    /// Remove this extra property once Xcode gets fixed.
-    @IBOutlet public var ibDelegate: AnyObject? {
-        get {
-            return delegate
-        }
-        set {
-            delegate = newValue as? IPaGalleryPreviewViewDelegate
-        }
-    }
+//    /// Workaround for Xcode bug that prevents you from connecting the delegate in the storyboard.
+//    /// Remove this extra property once Xcode gets fixed.
+//    @IBOutlet public var ibDelegate: AnyObject? {
+//        get {
+//            return delegate
+//        }
+//        set {
+//            delegate = newValue as? IPaGalleryPreviewViewDelegate
+//        }
+//    }
     lazy var previewViewControllers:[IPaImagePreviewViewController] = {
 
         let previewViewController = IPaImagePreviewViewController()
@@ -73,11 +73,27 @@ open class IPaGalleryPreviewView: UIView {
         previewViewController3.delegate = self
         return [previewViewController,previewViewController2,previewViewController3]
     }()
-    @objc open dynamic var currentIndex = 0
+    @objc dynamic fileprivate var _currentIndex = 0
+    @objc open dynamic var currentIndex:Int {
+        get {
+            return _currentIndex
+        }
+        set {
+            self._currentIndex = newValue
+            self.reloadData()
+            self.reloadCurrentPage()
+        }
+    }
     open var currentImageSize:CGSize {
         get {
             return self.currentPreviewViewController.contentImageView.bounds.size
         }
+    }
+    @objc class open override func keyPathsForValuesAffectingValue(forKey key: String) -> Set<String> {
+        if key == "currentIndex" {
+            return Set<String>(arrayLiteral:"_currentIndex")
+        }
+        return super.keyPathsForValuesAffectingValue(forKey: key)
     }
     override open func awakeFromNib() {
         super.awakeFromNib()
@@ -105,7 +121,7 @@ open class IPaGalleryPreviewView: UIView {
         self.currentPreviewViewController.contentImageView.transform = transform
     }
     open func reloadCurrentPage() {
-        self.delegate?.loadImage(self, index: currentIndex, complete: {
+        self.currentPreviewViewController.image = self.delegate?.loadImage(self, index: _currentIndex, complete: {
             image in
             self.currentPreviewViewController.image = image
         })
@@ -115,12 +131,12 @@ open class IPaGalleryPreviewView: UIView {
     open func reloadData() {
         let numberCount = delegate?.numberOfImages(self) ?? 0
         var direction:UIPageViewController.NavigationDirection = .forward
-        if currentIndex >= numberCount {
-            currentIndex = numberCount - 1
+        if _currentIndex >= numberCount {
+            _currentIndex = numberCount - 1
             direction = .reverse
         }
-        if currentIndex < 0 {
-            currentIndex = 0
+        if _currentIndex < 0 {
+            _currentIndex = 0
         }
         let thisViewController = currentPreviewViewController
         
@@ -137,16 +153,16 @@ open class IPaGalleryPreviewView: UIView {
         let lastViewController = previewViewControllers[lastIndex]
         
         
-        nextViewController.pageIndex = currentIndex + 1
-        thisViewController.pageIndex = currentIndex
-        lastViewController.pageIndex = currentIndex - 1
+        nextViewController.pageIndex = _currentIndex + 1
+        thisViewController.pageIndex = _currentIndex
+        lastViewController.pageIndex = _currentIndex - 1
         pageViewController.setViewControllers([thisViewController], direction: direction, animated: false, completion: nil)
     }
     @objc func onZoom(_ sender:UITapGestureRecognizer)
     {
         for previewViewController in previewViewControllers
         {
-            if previewViewController.pageIndex == currentIndex {
+            if previewViewController.pageIndex == _currentIndex {
                 previewViewController.onZoom(sender)
             }
         }
@@ -155,8 +171,11 @@ open class IPaGalleryPreviewView: UIView {
 }
 extension IPaGalleryPreviewView:IPaImagePreviewViewControllerDelegate
 {
-    func loadImage(index: Int, complete: @escaping (UIImage?) -> ()) {
-        self.delegate?.loadImage(self, index: index, complete: complete)
+    func loadImage(index: Int, complete: @escaping (UIImage?,Int) -> ()) -> UIImage? {
+        return self.delegate?.loadImage(self, index: index, complete: {
+            image in
+            complete(image,index)
+        })
     }
     func customView(_ previewViewController:IPaImagePreviewViewController,reuseCustomView:UIView?) ->  UIView?
     {
@@ -212,7 +231,7 @@ extension IPaGalleryPreviewView:UIPageViewControllerDataSource,UIPageViewControl
     public func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
         if completed {
             let viewController = pageViewController.viewControllers!.first! as! IPaImagePreviewViewController
-            currentIndex = viewController.pageIndex
+            _currentIndex = viewController.pageIndex
         }
     }
 }
