@@ -172,6 +172,9 @@ open class IPaGalleryPreviewView: UIView {
 extension IPaGalleryPreviewView:IPaImagePreviewViewControllerDelegate
 {
     func loadImage(index: Int, complete: @escaping (UIImage?,Int) -> ()) -> UIImage? {
+        guard index >= 0 , index < (self.delegate?.numberOfImages(self) ?? 0) else {
+            return nil
+        }
         return self.delegate?.loadImage(self, index: index, complete: {
             image in
             complete(image,index)
