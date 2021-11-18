@@ -15,7 +15,7 @@ import UIKit
     @objc optional func configure(_ galleryViewController:IPaGalleryPreviewViewController,index:Int,previewView:UIView)
 }
 open class IPaGalleryPreviewViewController: UIViewController {
-    open var delegate:IPaGalleryPreviewViewControllerDelegate!
+    open weak var delegate:IPaGalleryPreviewViewControllerDelegate?
     @objc open dynamic var currentIndex:Int {
         get {
             return self.galleryView.currentIndex
@@ -27,9 +27,10 @@ open class IPaGalleryPreviewViewController: UIViewController {
     var galleryView:IPaGalleryPreviewView {
         return self.view as! IPaGalleryPreviewView
     }
+    lazy var tapGestureRecognizer:UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(self.onTap(_:)))
     public override func loadView() {
         self.view  = IPaGalleryPreviewView(frame: .zero, delegate: self)
-        
+        self.view.addGestureRecognizer(self.tapGestureRecognizer)
     }
     open override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,7 +38,12 @@ open class IPaGalleryPreviewViewController: UIViewController {
         // Do any additional setup after loading the view.
     }
     
-
+    @objc func onTap(_ sender:Any) {
+        guard let navBar = self.navigationController?.navigationBar else {
+            return
+        }
+        self.navigationController?.setNavigationBarHidden(!navBar.isHidden, animated: true)
+    }
     /*
     // MARK: - Navigation
 
@@ -54,16 +60,16 @@ extension IPaGalleryPreviewViewController : IPaGalleryPreviewViewDelegate
 {
     
     public func numberOfImages(_ galleryView:IPaGalleryPreviewView) -> Int {
-        self.delegate.numberOfImages(self)
+        self.delegate?.numberOfImages(self) ?? 0
     }
     public func imageUrl(for index: Int, galleryView: IPaGalleryPreviewView) -> URL? {
-        return self.delegate.imageUrl?(for: index, galleryViewController: self)
+        return self.delegate?.imageUrl?(for: index, galleryViewController: self)
     }
     public func loadImage(_ galleryView:IPaGalleryPreviewView,index:Int,complete:@escaping (UIImage?)->()) -> UIImage? {
-        self.delegate.loadImage?(self, index: index, complete: complete)
+        self.delegate?.loadImage?(self, index: index, complete: complete)
     }
     public func configure(_ galleryView: IPaGalleryPreviewView, index: Int, previewView: UIView) {
-        self.delegate.configure?(self, index: index, previewView: previewView)
+        self.delegate?.configure?(self, index: index, previewView: previewView)
         
     }
     
