@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'IPaImagePreviewer'
-  s.version          = '3.3'
+  s.version          = '4.0'
   s.summary          = 'A short description of IPaImagePreviewer.'
   s.swift_version    = '5.3'
 # This description is used to generate tags and improve search results.
@@ -40,5 +40,5 @@ TODO: Add long description of the pod here.
   # s.frameworks = 'UIKit', 'MapKit'
   # s.dependency 'AFNetworking', '~> 2.3'
     s.dependency 'IPaIndicator', '~> 3.4'
-    
+    s.dependency 'IPaUIKitHelper/IPaUIKitHelper', '~> 1.0'
 end

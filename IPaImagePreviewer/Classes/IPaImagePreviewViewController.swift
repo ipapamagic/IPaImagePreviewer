@@ -8,13 +8,8 @@
 
 import UIKit
 import IPaIndicator
-protocol IPaImagePreviewViewControllerDelegate
-{
-    func loadImage(index:Int,complete:@escaping (UIImage?,Int)->()) -> UIImage?
-    func customView(_ previewViewController:IPaImagePreviewViewController,reuseCustomView:UIView?) ->  UIView?
-}
+
 class IPaImagePreviewViewController: UIViewController,UIScrollViewDelegate,UIGestureRecognizerDelegate{
-    var delegate:IPaImagePreviewViewControllerDelegate!
     lazy var previewView:IPaImagePreviewView = {
         let previewView = IPaImagePreviewView(frame:self.view.bounds)
         previewView.translatesAutoresizingMaskIntoConstraints = false
@@ -36,28 +31,7 @@ class IPaImagePreviewViewController: UIViewController,UIScrollViewDelegate,UIGes
             return previewView.contentImageView
         }
     }
-    var customView:UIView?
-    {
-        didSet {
-            if let oldValue = oldValue {
-                if oldValue == customView {
-                    return
-                }
-                else {
-                    oldValue.removeFromSuperview()
-                }
-            }
-            if let customView = customView {
-                customView.autoresizingMask = [.flexibleHeight,.flexibleWidth]
-                customView.translatesAutoresizingMaskIntoConstraints = true
-                
-                customView.frame = self.view.bounds
-                self.view.addSubview(customView)
-                
-            }
-            
-        }
-    }
+    
     var image:UIImage? {
         get {
             return previewView.image
@@ -66,18 +40,15 @@ class IPaImagePreviewViewController: UIViewController,UIScrollViewDelegate,UIGes
             previewView.image = newValue
         }
     }
-    var pageIndex:Int = 0 {
-        didSet {
-            previewView.image = self.delegate.loadImage(index: pageIndex, complete: {
-                loadedImage,index in
-                if index == self.pageIndex {
-                    self.previewView.image = loadedImage
-                }
-            })
-            
-            self.customView = self.delegate.customView(self, reuseCustomView: self.customView)
+    var imageUrl:URL? {
+        get {
+            return previewView.imageUrl
+        }
+        set {
+            previewView.imageUrl = newValue
         }
     }
+    var pageIndex:Int = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()

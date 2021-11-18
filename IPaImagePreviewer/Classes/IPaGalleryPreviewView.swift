@@ -9,8 +9,11 @@
 import UIKit
 @objc public protocol IPaGalleryPreviewViewDelegate {
     func numberOfImages(_ galleryView:IPaGalleryPreviewView) -> Int
-    func loadImage(_ galleryView:IPaGalleryPreviewView,index:Int,complete:@escaping (UIImage?)->()) -> UIImage?
-    func customView(_ galleryView:IPaGalleryPreviewView,index:Int,reuseCustomView:UIView?) ->  UIView?
+    @objc optional func loadImage(_ galleryView:IPaGalleryPreviewView,index:Int,complete:@escaping (UIImage?)->()) -> UIImage?
+    
+    @objc optional func imageUrl(for index:Int, galleryView:IPaGalleryPreviewView) -> URL?
+    
+    @objc optional func configure(_ galleryView:IPaGalleryPreviewView,index:Int,previewView:UIView)
 }
 open class IPaGalleryPreviewView: UIView {
     lazy var pageViewController:UIPageViewController = {
@@ -19,8 +22,7 @@ open class IPaGalleryPreviewView: UIView {
         pageViewController.dataSource = self
         pageViewController.view.backgroundColor = UIColor.black
         let previewViewController = self.previewViewControllers.first!
-        previewViewController.pageIndex = self._currentIndex
-        previewViewController.delegate = self
+        self.setContent(for: previewViewController, pageIndex: self._currentIndex)
         pageViewController.setViewControllers([previewViewController], direction:.forward, animated: false, completion: nil)
         
         
@@ -68,9 +70,7 @@ open class IPaGalleryPreviewView: UIView {
         let previewViewController = IPaImagePreviewViewController()
         let previewViewController2 = IPaImagePreviewViewController()
         let previewViewController3 = IPaImagePreviewViewController()
-        previewViewController.delegate = self
-        previewViewController2.delegate = self
-        previewViewController3.delegate = self
+        
         return [previewViewController,previewViewController2,previewViewController3]
     }()
     @objc dynamic fileprivate var _currentIndex = 0
@@ -99,14 +99,38 @@ open class IPaGalleryPreviewView: UIView {
         super.awakeFromNib()
         self.initialSetting()
     }
+    public init(frame:CGRect,delegate:IPaGalleryPreviewViewDelegate) {
+        super.init(frame: frame)
+        self.delegate = delegate
+        initialSetting()
+    }
     override public init(frame: CGRect) {
         super.init(frame: frame)
-        self.initialSetting()
+        initialSetting()
     }
     
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-//        self.initialSetting()
+        self.initialSetting()
+    }
+    func setContent(for previewVC:IPaImagePreviewViewController,pageIndex:Int) {
+        previewVC.pageIndex = pageIndex
+        guard let imageNumber = self.delegate?.numberOfImages(self) ,pageIndex >= 0 && pageIndex < imageNumber else {
+            previewVC.previewView.image = nil
+            return
+        }
+        
+        if let imageUrl = self.delegate?.imageUrl?(for: pageIndex, galleryView: self) {
+            previewVC.previewView.imageUrl = imageUrl
+        }
+        else {
+            previewVC.previewView.image = self.delegate?.loadImage?(self, index: pageIndex, complete: { image in
+                if previewVC.pageIndex == pageIndex {
+                    previewVC.previewView.image = image
+                }
+            })
+        }
+        
     }
     func initialSetting() {
         pageViewController.view.translatesAutoresizingMaskIntoConstraints = false
@@ -116,15 +140,10 @@ open class IPaGalleryPreviewView: UIView {
         self.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|[view]|",options:NSLayoutConstraint.FormatOptions(rawValue: 0),metrics:nil,views:viewsDict))
         self.addGestureRecognizer(self.doubleTapRecognizer)
     }
-    open func setCurrentImage(transform:CGAffineTransform)
-    {
-        self.currentPreviewViewController.contentImageView.transform = transform
-    }
+    
+    
     open func reloadCurrentPage() {
-        self.currentPreviewViewController.image = self.delegate?.loadImage(self, index: _currentIndex, complete: {
-            image in
-            self.currentPreviewViewController.image = image
-        })
+        self.setContent(for: self.currentPreviewViewController, pageIndex: self.currentPreviewViewController.pageIndex)
         
         
     }
@@ -153,9 +172,10 @@ open class IPaGalleryPreviewView: UIView {
         let lastViewController = previewViewControllers[lastIndex]
         
         
-        nextViewController.pageIndex = _currentIndex + 1
-        thisViewController.pageIndex = _currentIndex
-        lastViewController.pageIndex = _currentIndex - 1
+
+        self.setContent(for: nextViewController, pageIndex: self._currentIndex + 1)
+        self.setContent(for: thisViewController, pageIndex: self._currentIndex)
+        self.setContent(for: lastViewController, pageIndex: self._currentIndex)
         pageViewController.setViewControllers([thisViewController], direction: direction, animated: false, completion: nil)
     }
     @objc func onZoom(_ sender:UITapGestureRecognizer)
@@ -169,22 +189,7 @@ open class IPaGalleryPreviewView: UIView {
     }
     
 }
-extension IPaGalleryPreviewView:IPaImagePreviewViewControllerDelegate
-{
-    func loadImage(index: Int, complete: @escaping (UIImage?,Int) -> ()) -> UIImage? {
-        guard index >= 0 , index < (self.delegate?.numberOfImages(self) ?? 0) else {
-            return nil
-        }
-        return self.delegate?.loadImage(self, index: index, complete: {
-            image in
-            complete(image,index)
-        })
-    }
-    func customView(_ previewViewController:IPaImagePreviewViewController,reuseCustomView:UIView?) ->  UIView?
-    {
-        return self.delegate?.customView(self, index: previewViewController.pageIndex, reuseCustomView: reuseCustomView)
-    }
-}
+
 extension IPaGalleryPreviewView:UIPageViewControllerDataSource,UIPageViewControllerDelegate
 {
     //MARK : UIPageViewControllerDataSource

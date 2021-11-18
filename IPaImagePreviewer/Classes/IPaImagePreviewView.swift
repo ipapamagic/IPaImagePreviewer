@@ -7,20 +7,9 @@
 //
 
 import UIKit
+import IPaUIKitHelper
 
 open class IPaImagePreviewView: UIView {
-
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-    
     lazy var contentScrollView:UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.delegate = self
@@ -65,22 +54,68 @@ open class IPaImagePreviewView: UIView {
     lazy var imgViewLeadingConstraint = NSLayoutConstraint()
     lazy var imgViewBottomConstraint = NSLayoutConstraint()
     lazy var imgViewTrailingConstraint = NSLayoutConstraint()
+    lazy var loadingIndicatorView:UIActivityIndicatorView = {
+        var view:UIActivityIndicatorView
+        if #available(iOS 13.0, *) {
+            view = UIActivityIndicatorView(style: .large)
+        } else {
+            // Fallback on earlier versions
+            view = UIActivityIndicatorView(style: .whiteLarge)
+        }
+        view.isHidden = true
+        view.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(view)
+        view.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
+        view.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
+        view.color = .white
+        return view
+    }()
     open var image:UIImage? {
         get {
             return contentImageView.image
         }
         set {
             contentImageView.image = newValue
-            contentImageView.transform = .identity
-            contentScrollView.setZoomScale(1, animated: false)
-          
-            self.refreshPicture()
-            contentScrollView.layoutIfNeeded()
+            
+        }
+    }
+    open var imageUrl:URL? {
+        get {
+            return contentImageView.imageUrl
+        }
+        set {
+            if newValue != nil ,self.loadingIndicatorView.isHidden{
+                self.loadingIndicatorView.isHidden = false
+                
+                self.bringSubviewToFront(self.loadingIndicatorView)
+            }
+            contentImageView.imageUrl = newValue
+            
+            
+        }
+    }
+    open var imageURLString:String? {
+        get {
+            return contentImageView.imageURLString
+        }
+        set {
+            contentImageView.imageURLString = newValue
         }
     }
     open var imageRect:CGRect {
         get {
             return contentImageView.frame
+        }
+    }
+    fileprivate var imageObserver:NSKeyValueObservation?
+    fileprivate func initialSetting() {
+        self.imageObserver = self.contentImageView.observe(\.image) { imageView, Value in
+            self.contentImageView.transform = .identity
+            self.contentScrollView.setZoomScale(1, animated: false)
+          
+            self.refreshPicture()
+            self.contentScrollView.layoutIfNeeded()
+            self.loadingIndicatorView.isHidden = true
         }
     }
     open override func layoutSubviews() {
@@ -93,7 +128,6 @@ open class IPaImagePreviewView: UIView {
     }
     func refreshPictureImageView(_ scale:CGFloat)
     {
-        
         let viewWidth = self.bounds.width
         let viewHeight = self.bounds.height
         
