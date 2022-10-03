@@ -1,0 +1,77 @@
+{
+  "pins" : [
+    {
+      "identity" : "ipadownloadmanager",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ipapamagic/IPaDownloadManager.git",
+      "state" : {
+        "revision" : "98abbc64a0b0eb95d05741bc10e5f46072f84af2",
+        "version" : "1.4.0"
+      }
+    },
+    {
+      "identity" : "ipafilecache",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ipapamagic/IPaFileCache.git",
+      "state" : {
+        "revision" : "e9a228b7685ecb85143127b157e974c8d1a0fef6",
+        "version" : "1.2.0"
+      }
+    },
+    {
+      "identity" : "ipaimagetool",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ipapamagic/IPaImageTool.git",
+      "state" : {
+        "revision" : "476267c70349b70ea0d4331fc2024168afde54a0",
+        "version" : "2.6.0"
+      }
+    },
+    {
+      "identity" : "ipalog",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ipapamagic/IPaLog.git",
+      "state" : {
+        "revision" : "69938bb622a5d6dea1fb1641a29e337281a1dbf5",
+        "version" : "3.1.0"
+      }
+    },
+    {
+      "identity" : "ipasecurity",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ipapamagic/IPaSecurity.git",
+      "state" : {
+        "revision" : "bcdb3560255dc7ef3607dce8da3bc00155b59a6b",
+        "version" : "4.1.0"
+      }
+    },
+    {
+      "identity" : "ipauikithelper",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ipapamagic/IPaUIKitHelper.git",
+      "state" : {
+        "revision" : "9e0b5d02482a3253c724c39f700de58640575730",
+        "version" : "1.2.0"
+      }
+    },
+    {
+      "identity" : "ipaurlresourceui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ipapamagic/IPaURLResourceUI.git",
+      "state" : {
+        "revision" : "be93e8b983e0372cae5209d6280e22af2a9e0060",
+        "version" : "5.4.0"
+      }
+    },
+    {
+      "identity" : "ipaxmlsection",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ipapamagic/IPaXMLSection.git",
+      "state" : {
+        "revision" : "b43fbdb26e55a68f48e33d5806344e37040fddef",
+        "version" : "2.2.0"
+      }
+    }
+  ],
+  "version" : 2
+}
