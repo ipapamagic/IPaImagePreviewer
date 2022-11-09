@@ -207,8 +207,8 @@ extension IPaGalleryPreviewView:UIPageViewControllerDataSource,UIPageViewControl
             let beforeViewController = previewViewControllers[ lastIndex]
             
             let index = previewViewController.pageIndex - 1
-            beforeViewController.pageIndex = index
-            
+            self.setContent(for: beforeViewController, pageIndex: index)
+
             return beforeViewController
         
         }
@@ -230,8 +230,7 @@ extension IPaGalleryPreviewView:UIPageViewControllerDataSource,UIPageViewControl
             let nextViewController = previewViewControllers[ nextIndex]
             
             let index = previewViewController.pageIndex + 1
-            nextViewController.pageIndex = index
-            
+            self.setContent(for: nextViewController, pageIndex: index)
             return nextViewController
         }
         return nil

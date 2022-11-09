@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import IPaIndicator
+import IPaUIKitHelper
 
 class IPaImagePreviewViewController: UIViewController,UIScrollViewDelegate,UIGestureRecognizerDelegate{
     lazy var previewView:IPaImagePreviewView = {
@@ -66,7 +66,10 @@ class IPaImagePreviewViewController: UIViewController,UIScrollViewDelegate,UIGes
         // Dispose of any resources that can be recreated.
     }
     
-    
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        previewView.refreshPicture()
+    }
     /*
     // MARK: - Navigation
     
