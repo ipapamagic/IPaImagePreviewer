@@ -10,7 +10,18 @@ import UIKit
 import IPaUIKitHelper
 
 open class IPaImagePreviewView: UIView {
-    lazy var contentScrollView:UIScrollView = {
+    public var imageContentEdgeInsets:UIEdgeInsets = .zero {
+        didSet {
+            refreshPicture()
+        }
+    }
+    //get content image view size from constraints
+    public var contentImageViewSize:CGSize {
+        get {
+            return CGSize(width: imgViewWidthConstraint.constant, height: imgViewHeightConstraint.constant)
+        }
+    }
+    public private(set) lazy var contentScrollView:UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.delegate = self
         scrollView.maximumZoomScale = 4
@@ -24,25 +35,31 @@ open class IPaImagePreviewView: UIView {
         //   scrollView.addGestureRecognizer(self.doubleTapRecognizer)
         return scrollView
     }()
-    
-    //    @IBOutlet var singleTapRecognizer: UITapGestureRecognizer!
-    lazy var contentImageView:UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        self.contentScrollView.addSubview(imageView)
-        self.imgViewWidthConstraint = NSLayoutConstraint(item: imageView, attribute: .width, relatedBy: .equal, toItem: nil, attribute:.notAnAttribute, multiplier: 1, constant: self.contentScrollView.bounds.width)
-        self.imgViewHeightConstraint = NSLayoutConstraint(item: imageView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: self.contentScrollView.bounds.height)
+    public private(set) lazy var contentImageContainerView:IPaUIUntouchableView = {
+        let view = IPaUIUntouchableView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .clear
+        self.contentScrollView.addSubview(view)
         
-        self.imgViewLeadingConstraint = NSLayoutConstraint(item: self.contentScrollView, attribute: .leading, relatedBy: .equal, toItem: imageView, attribute: .leading, multiplier: 1, constant: 0)
+        self.imgViewWidthConstraint = NSLayoutConstraint(item: view, attribute: .width, relatedBy: .equal, toItem: nil, attribute:.notAnAttribute, multiplier: 1, constant: self.contentScrollView.bounds.width)
+        self.imgViewHeightConstraint = NSLayoutConstraint(item: view, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: self.contentScrollView.bounds.height)
         
-        self.imgViewTopConstraint = NSLayoutConstraint(item: self.contentScrollView, attribute: .top, relatedBy: .equal, toItem: imageView, attribute: .top, multiplier: 1, constant: 0)
-        self.imgViewBottomConstraint = NSLayoutConstraint(item: self.contentScrollView, attribute: .bottom, relatedBy: .equal, toItem: imageView, attribute: .bottom, multiplier: 1, constant: 0)
+        self.imgViewLeadingConstraint = NSLayoutConstraint(item: self.contentScrollView, attribute: .leading, relatedBy: .equal, toItem: view, attribute: .leading, multiplier: 1, constant: 0)
         
-        self.imgViewTrailingConstraint = NSLayoutConstraint(item: self.contentScrollView, attribute: .trailing, relatedBy: .equal, toItem: imageView, attribute: .trailing, multiplier: 1, constant: 0)
-        imageView.addConstraints([self.imgViewWidthConstraint,self.imgViewHeightConstraint])
+        self.imgViewTopConstraint = NSLayoutConstraint(item: self.contentScrollView, attribute: .top, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1, constant: 0)
+        self.imgViewBottomConstraint = NSLayoutConstraint(item: self.contentScrollView, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0)
+        
+        self.imgViewTrailingConstraint = NSLayoutConstraint(item: self.contentScrollView, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1, constant: 0)
+        view.addConstraints([self.imgViewWidthConstraint,self.imgViewHeightConstraint])
         
         self.contentScrollView.addConstraints([self.imgViewLeadingConstraint,self.imgViewTopConstraint,self.imgViewBottomConstraint,self.imgViewTrailingConstraint])
+        return view
+    }()
+    //    @IBOutlet var singleTapRecognizer: UITapGestureRecognizer!
+    public private(set) lazy var contentImageView:UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        self.contentImageContainerView.addSubviewToFill(imageView)
         
         
         return imageView
@@ -70,6 +87,24 @@ open class IPaImagePreviewView: UIView {
         view.color = .white
         return view
     }()
+    private var contentInsets:UIEdgeInsets {
+        get {
+            var edgeInsets = self.contentScrollView.contentInset
+            edgeInsets.top -= self.imageContentEdgeInsets.top
+            edgeInsets.bottom -= self.imageContentEdgeInsets.bottom
+            edgeInsets.left -= self.imageContentEdgeInsets.left
+            edgeInsets.right -= self.imageContentEdgeInsets.right
+            return edgeInsets
+        }
+        set {
+            var edgeInsets = newValue
+            edgeInsets.top += self.imageContentEdgeInsets.top
+            edgeInsets.bottom += self.imageContentEdgeInsets.bottom
+            edgeInsets.left += self.imageContentEdgeInsets.left
+            edgeInsets.right += self.imageContentEdgeInsets.right
+            contentScrollView.contentInset = edgeInsets
+        }
+    }
     open var image:UIImage? {
         get {
             return contentImageView.image
@@ -128,8 +163,8 @@ open class IPaImagePreviewView: UIView {
     }
     func refreshPictureImageView(_ scale:CGFloat)
     {
-        let viewWidth = self.bounds.width
-        let viewHeight = self.bounds.height
+        let viewWidth = self.bounds.width - self.imageContentEdgeInsets.right - self.imageContentEdgeInsets.left
+        let viewHeight = self.bounds.height - self.imageContentEdgeInsets.top - self.imageContentEdgeInsets.bottom
         
         var imageWidth:CGFloat = 1
         var imageHeight:CGFloat = 1
@@ -147,14 +182,15 @@ open class IPaImagePreviewView: UIView {
         if ratio >= viewRatio {
             imageViewWidth = viewWidth * scale
             imageViewHeight = imageViewWidth / ratio
-            contentScrollView.contentInset = UIEdgeInsets(top: max(0,max(0,(viewHeight - imageViewHeight) * 0.5)), left: 0, bottom: 0, right: 0)
+            self.contentInsets = UIEdgeInsets(top: max(0,max(0,(viewHeight - imageViewHeight) * 0.5)), left: 0, bottom: 0, right: 0)
+            
             //            imgViewLeadingConstraint.constant = 0
             //            imgViewTopConstraint.constant = -max(0,(viewHeight - imageViewHeight) * 0.5)
         }
         else {
             imageViewHeight = viewHeight * scale
             imageViewWidth = imageViewHeight * ratio
-            contentScrollView.contentInset = UIEdgeInsets(top: 0, left:max(0,(viewWidth - imageViewWidth) * 0.5), bottom: 0, right: 0)
+            self.contentInsets = UIEdgeInsets(top: 0, left:max(0,(viewWidth - imageViewWidth) * 0.5), bottom: 0, right: 0)
             //            imgViewTopConstraint.constant = 0
             //            imgViewLeadingConstraint.constant = -max(0,(viewWidth - imageViewWidth) * 0.5)
         }
@@ -168,7 +204,7 @@ extension IPaImagePreviewView:UIScrollViewDelegate
 {
     //MARK:UIScrollViewDelegate
     public func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        return contentImageView
+        return self.contentImageContainerView
     }
     public func scrollViewDidZoom(_ scrollView: UIScrollView) {
         self.refreshPicture()
