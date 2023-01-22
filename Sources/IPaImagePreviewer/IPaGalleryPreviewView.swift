@@ -9,7 +9,7 @@
 import UIKit
 @objc public protocol IPaGalleryPreviewViewDelegate {
     func numberOfImages(_ galleryView:IPaGalleryPreviewView) -> Int
-    @objc optional func loadImage(_ galleryView:IPaGalleryPreviewView,index:Int,complete:@escaping (UIImage?)->()) -> UIImage?
+    @objc optional func loadImage(_ galleryView:IPaGalleryPreviewView,index:Int,complete:@escaping (UIImage?)->())
     
     @objc optional func imageUrl(for index:Int, galleryView:IPaGalleryPreviewView) -> URL?
     
@@ -124,7 +124,8 @@ open class IPaGalleryPreviewView: UIView {
             previewVC.previewView.imageUrl = imageUrl
         }
         else {
-            previewVC.previewView.image = self.delegate?.loadImage?(self, index: pageIndex, complete: { image in
+            previewVC.previewView.image = nil
+            self.delegate?.loadImage?(self, index: pageIndex, complete: { image in
                 if previewVC.pageIndex == pageIndex {
                     previewVC.previewView.image = image
                 }
@@ -173,9 +174,9 @@ open class IPaGalleryPreviewView: UIView {
         
         
 
-        self.setContent(for: nextViewController, pageIndex: self._currentIndex + 1)
+        self.setContent(for: nextViewController, pageIndex: nextIndex)
         self.setContent(for: thisViewController, pageIndex: self._currentIndex)
-        self.setContent(for: lastViewController, pageIndex: self._currentIndex)
+        self.setContent(for: lastViewController, pageIndex: lastIndex)
         pageViewController.setViewControllers([thisViewController], direction: direction, animated: false, completion: nil)
     }
     @objc func onZoom(_ sender:UITapGestureRecognizer)

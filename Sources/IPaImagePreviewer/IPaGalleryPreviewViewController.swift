@@ -65,7 +65,7 @@ extension IPaGalleryPreviewViewController : IPaGalleryPreviewViewDelegate
     public func imageUrl(for index: Int, galleryView: IPaGalleryPreviewView) -> URL? {
         return self.delegate?.imageUrl?(for: index, galleryViewController: self)
     }
-    public func loadImage(_ galleryView:IPaGalleryPreviewView,index:Int,complete:@escaping (UIImage?)->()) -> UIImage? {
+    public func loadImage(_ galleryView:IPaGalleryPreviewView,index:Int,complete:@escaping (UIImage?)->()) {
         self.delegate?.loadImage?(self, index: index, complete: complete)
     }
     public func configure(_ galleryView: IPaGalleryPreviewView, index: Int, previewView: UIView) {
