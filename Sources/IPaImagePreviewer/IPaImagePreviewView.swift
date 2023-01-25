@@ -169,6 +169,10 @@ open class IPaImagePreviewView: UIView {
         var imageWidth:CGFloat = 1
         var imageHeight:CGFloat = 1
         guard let image = image else {
+            self.contentInsets = .zero
+            imgViewWidthConstraint.constant = self.bounds.width
+            imgViewHeightConstraint.constant = self.bounds.height
+            
             return
             
         }

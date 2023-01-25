@@ -79,6 +79,9 @@ open class IPaGalleryPreviewView: UIView {
             return _currentIndex
         }
         set {
+            guard self._currentIndex != newValue else {
+                return
+            }
             self._currentIndex = newValue
             self.reloadData()
             self.reloadCurrentPage()
@@ -174,9 +177,9 @@ open class IPaGalleryPreviewView: UIView {
         
         
 
-        self.setContent(for: nextViewController, pageIndex: nextIndex)
+//        self.setContent(for: nextViewController, pageIndex: nextIndex)
         self.setContent(for: thisViewController, pageIndex: self._currentIndex)
-        self.setContent(for: lastViewController, pageIndex: lastIndex)
+//        self.setContent(for: lastViewController, pageIndex: lastIndex)
         pageViewController.setViewControllers([thisViewController], direction: direction, animated: false, completion: nil)
     }
     @objc func onZoom(_ sender:UITapGestureRecognizer)
