@@ -172,8 +172,8 @@ open class IPaGalleryPreviewView: UIView {
         if lastIndex < 0 {
             lastIndex = previewViewControllers.count - 1
         }
-        let nextViewController = previewViewControllers[nextIndex]
-        let lastViewController = previewViewControllers[lastIndex]
+//        let nextViewController = previewViewControllers[nextIndex]
+//        let lastViewController = previewViewControllers[lastIndex]
         
         
 

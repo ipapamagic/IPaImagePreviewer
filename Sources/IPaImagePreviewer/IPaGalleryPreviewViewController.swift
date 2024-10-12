@@ -16,6 +16,9 @@ import UIKit
 }
 open class IPaGalleryPreviewViewController: UIViewController {
     open weak var delegate:IPaGalleryPreviewViewControllerDelegate?
+    public var pageViewCotnroller:UIPageViewController {
+        return self.galleryView.pageViewController
+    }
     @objc open dynamic var currentIndex:Int {
         get {
             return self.galleryView.currentIndex
@@ -66,7 +69,7 @@ extension IPaGalleryPreviewViewController : IPaGalleryPreviewViewDelegate
         return self.delegate?.imageUrl?(for: index, galleryViewController: self)
     }
     public func loadImage(_ galleryView:IPaGalleryPreviewView,index:Int,complete:@escaping (UIImage?)->()) {
-        self.delegate?.loadImage?(self, index: index, complete: complete)
+        _ = self.delegate?.loadImage?(self, index: index, complete: complete)
     }
     public func configure(_ galleryView: IPaGalleryPreviewView, index: Int, previewView: UIView) {
         self.delegate?.configure?(self, index: index, previewView: previewView)
