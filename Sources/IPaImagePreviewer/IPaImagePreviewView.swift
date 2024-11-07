@@ -8,8 +8,10 @@
 
 import UIKit
 import IPaUIKitHelper
-
+import Combine
 open class IPaImagePreviewView: UIView {
+    public var zoomScalePublisher = PassthroughSubject<CGFloat, Never>()
+    
     public var imageContentEdgeInsets:UIEdgeInsets = .zero {
         didSet {
             refreshPicture()
@@ -212,6 +214,7 @@ extension IPaImagePreviewView:UIScrollViewDelegate
     }
     public func scrollViewDidZoom(_ scrollView: UIScrollView) {
         self.refreshPicture()
+        zoomScalePublisher.send(scrollView.zoomScale)
     }
     public func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
         UIView.animate(withDuration: 0.3, animations: {
