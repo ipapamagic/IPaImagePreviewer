@@ -145,6 +145,14 @@ open class IPaImagePreviewView: UIView {
         }
     }
     fileprivate var imageObserver:NSKeyValueObservation?
+    public override init(frame: CGRect) {
+        super.init(frame: frame)
+        self.initialSetting()
+    }
+    public required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        self.initialSetting()
+    }
     fileprivate func initialSetting() {
         self.imageObserver = self.contentImageView.observe(\.image) { imageView, Value in
             self.contentImageView.transform = .identity
@@ -158,6 +166,9 @@ open class IPaImagePreviewView: UIView {
     open override func layoutSubviews() {
         super.layoutSubviews()
         self.refreshPicture()
+    }
+    public func moveToCenter(_ animated:Bool) {
+        self.contentScrollView.setContentOffset(CGPoint(x:(self.contentScrollView.contentSize.width  - self.contentScrollView.frame.width) * 0.5,y: (self.contentScrollView.contentSize.height  - self.contentScrollView.frame.height) * 0.5), animated: animated)
     }
     open func refreshPicture()
     {
@@ -185,7 +196,7 @@ open class IPaImagePreviewView: UIView {
         
         var imageViewWidth:CGFloat
         var imageViewHeight:CGFloat
-        if ratio >= viewRatio {
+        if ratio < viewRatio {
             imageViewWidth = viewWidth * scale
             imageViewHeight = imageViewWidth / ratio
             self.contentInsets = UIEdgeInsets(top: max(0,max(0,(viewHeight - imageViewHeight) * 0.5)), left: 0, bottom: 0, right: 0)
