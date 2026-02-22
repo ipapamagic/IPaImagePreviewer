@@ -12,7 +12,8 @@ let package = Package(
             targets: ["IPaImagePreviewer"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/ipapamagic/IPaUIKitHelper.git", from: "1.2.0")
+        .package(url: "https://github.com/ipapamagic/IPaUIKitHelper.git", from: "1.3.1"),
+        .package(url: "https://github.com/ipapamagic/IPaIndicator.git", from: "4.0.1")
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
     ],
@@ -21,7 +22,7 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "IPaImagePreviewer",
-            dependencies: [.product(name: "IPaUIKitHelper", package: "IPaUIKitHelper"),.product(name: "IPaIndicator", package: "IPaUIKitHelper")]),
+            dependencies: [.product(name: "IPaUIKitHelper", package: "IPaUIKitHelper"),.product(name: "IPaIndicator", package: "IPaIndicator")]),
         .testTarget(
             name: "IPaImagePreviewerTests",
             dependencies: ["IPaImagePreviewer"]),

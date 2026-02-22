@@ -5,7 +5,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ipapamagic/IPaDownloadManager.git",
       "state" : {
-        "revision" : "98abbc64a0b0eb95d05741bc10e5f46072f84af2",
+        "revision" : "6ceea2ed278d888840ef2577bde9d27b4d6b7926",
         "version" : "1.4.0"
       }
     },
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ipapamagic/IPaImageTool.git",
       "state" : {
-        "revision" : "476267c70349b70ea0d4331fc2024168afde54a0",
-        "version" : "2.6.0"
+        "revision" : "3746b0150cbce944cff27c65e3a1a045b0e41044",
+        "version" : "2.6.1"
       }
     },
     {
@@ -41,7 +41,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ipapamagic/IPaSecurity.git",
       "state" : {
-        "revision" : "bcdb3560255dc7ef3607dce8da3bc00155b59a6b",
+        "revision" : "81eb5038e243e787695a515cfb9ea1639dbaaecb",
         "version" : "4.1.0"
       }
     },
@@ -50,26 +50,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/ipapamagic/IPaUIKitHelper.git",
       "state" : {
-        "revision" : "9e0b5d02482a3253c724c39f700de58640575730",
-        "version" : "1.2.0"
-      }
-    },
-    {
-      "identity" : "ipaurlresourceui",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ipapamagic/IPaURLResourceUI.git",
-      "state" : {
-        "revision" : "be93e8b983e0372cae5209d6280e22af2a9e0060",
-        "version" : "5.4.0"
-      }
-    },
-    {
-      "identity" : "ipaxmlsection",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ipapamagic/IPaXMLSection.git",
-      "state" : {
-        "revision" : "b43fbdb26e55a68f48e33d5806344e37040fddef",
-        "version" : "2.2.0"
+        "revision" : "a6f2487065aef3e505b978c83d20a5cccd00dfee",
+        "version" : "1.3.1"
       }
     }
   ],
