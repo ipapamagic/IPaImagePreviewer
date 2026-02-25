@@ -196,7 +196,7 @@ open class IPaImagePreviewView: UIView {
         
         var imageViewWidth:CGFloat
         var imageViewHeight:CGFloat
-        if ratio < viewRatio {
+        if ratio >= viewRatio {
             imageViewWidth = viewWidth * scale
             imageViewHeight = imageViewWidth / ratio
             self.contentInsets = UIEdgeInsets(top: max(0,max(0,(viewHeight - imageViewHeight) * 0.5)), left: 0, bottom: 0, right: 0)
